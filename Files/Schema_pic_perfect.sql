@@ -1,5 +1,5 @@
 CREATE table movie_info(
-  movie_id integer Not NULL,
+  movie_id SERIAL,
   movie_name varchar not NULL,
   short_discription varchar,
   long_discription varchar,
@@ -13,17 +13,18 @@ CREATE table movie_info(
   );
   
 CREATE TABLE user_details(
-  user_id varchar not NULL,
+  user_id SERIAL,
   first_name varchar(50) not NULL,
   last_name VARCHAR(50),
+  username VARCHAR(50) not NULL UNIQUE,
   password varchar(50) NOT NULL,
   is_admin boolean,
   PRIMARY kEY(user_id)
   );
   
  CREATE TABLE rating_review(
-   movie_id integer not NULL,
-   user_id varchar not NULL,
+   movie_id SERIAL,
+   user_id SERIAL,
    rating integer,
    review varchar,
    FOREIGN key (movie_id) REFERENCES movie_info(movie_id),
@@ -33,16 +34,16 @@ CREATE TABLE user_details(
 
  
  CREATE table cineplex_info(
-   cineplex_id integer not NULL,
+   cineplex_id SERIAL,
    cineplex_name varchar not NULL,
    city Varchar not NULL,
    PRIMARY key (cineplex_id)
   );
 
  create table show_id(
-   show_id integer not NULL,
-   movie_id integer not NULL,
-   cineplex_id integer not NULL,
+   show_id SERIAL,
+   movie_id SERIAL,
+   cineplex_id SERIAL,
    starting_time TIME not NULL,
    end_time TIME not NULL,
    PRIMARY key (show_id),
