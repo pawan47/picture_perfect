@@ -17,7 +17,7 @@ CREATE TABLE user_details(
   first_name varchar(50) not NULL,
   last_name VARCHAR(50),
   username VARCHAR(50) not NULL UNIQUE,
-  password varchar(50) NOT NULL,
+  password VARCHAR NOT NULL,
   is_admin boolean,
   PRIMARY kEY(user_id)
   );
