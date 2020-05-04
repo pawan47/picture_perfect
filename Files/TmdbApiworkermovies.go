@@ -43,6 +43,7 @@ func main() {
 	for i := 0; i < len(list.Results); i++ {
 		movies = append(movies, (list.Results)[i].ID)
 	}
+	count := 0
 	for i := 0; i < len(movies); i++ {
 
 		det, err := tmdbClient.GetMovieDetails(int(movies[i]), nil)
@@ -69,10 +70,11 @@ func main() {
 			fmt.Println(err)
 			continue
 		}
-		MovieArray = append(MovieArray, mov)
+		count++
+		// MovieArray = append(MovieArray, mov)
 	}
 	defer db.Close()
-	fmt.Println(len(MovieArray))
+	fmt.Println(count)
 }
 
 func connect() (*sql.DB, error) {
