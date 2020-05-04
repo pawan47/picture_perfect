@@ -9,6 +9,8 @@ CREATE table movie_info(
   actor varchar,
   actress varchar,
   director varchar,
+  vote_average float,
+  vote_count integer,
   PRIMARY key(movie_id)
   );
   
