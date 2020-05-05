@@ -9,24 +9,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// MoviesInfo will be used to hold various movies details from db
-type MoviesInfo struct {
-	MovieID       int     `json:"movie_id"`
-	Title         string  `json:"movie_name"`
-	Language      string  `json:"language"`
-	ThumbnailLink string  `json:"thumbnail_link"`
-	Genre         string  `json:"genre"`
-	Overview      string  `json:"long_discription"`
-	Tagline       string  `json:"short_discription"`
-	VoteAverage   float32 `json:"vote_average"`
-	VoteCount     int64   `json:"vote_count"`
-	Actor         *string `json:"actor"`
-	Actress       *string `json:"actress"`
-	Director      *string `json:"director"`
-	UserRating    int     `json:"user_rating"`
-	UserReview    string  `json:"user_review"`
-}
-
 // GetMoviesByID is a endpoint for the GET /movies/{name} request
 func GetMoviesByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

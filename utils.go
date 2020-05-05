@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,6 +20,10 @@ func EndpointsInit() {
 	r.HandleFunc("/logout", Logout).Methods("POST")
 	r.HandleFunc("/reset", Reset).Methods("POST")
 	r.HandleFunc("/movie/catalogue/{ID}", GetMoviesByID).Methods("GET")
+	r.HandleFunc("/movies/rating/{ID}", RateMovie).Methods("POST")
+	r.HandleFunc("/movies/review/{ID}", ReviewMovie).Methods("POST")
+	// r.HandleFunc("/movies/rating/{ID}", DelRateMovie).Methods("DELETE")
+	// r.HandleFunc("/movies/review/{ID}", DelReviewMovie).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
@@ -104,4 +109,15 @@ func GetReviewbyID(ID, MovieID int) string {
 		return ""
 	}
 	return review
+}
+
+// RowExists will
+func RowExists(query string, args ...interface{}) bool {
+	var exists bool
+	query = fmt.Sprintf("SELECT exists (%s)", query)
+	err := Dbhandler.db.QueryRow(query, args...).Scan(&exists)
+	if err != nil && err != sql.ErrNoRows {
+		return false
+	}
+	return exists
 }
