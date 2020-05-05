@@ -18,7 +18,7 @@ func EndpointsInit() {
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/logout", Logout).Methods("POST")
 	r.HandleFunc("/reset", Reset).Methods("POST")
-	// r.HandleFunc("/movie/catalogue/{}", GetMoviesList).Methods("GET")
+	r.HandleFunc("/movie/catalogue/{ID}", GetMoviesByID).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
@@ -71,4 +71,37 @@ func VerifyToken(token string) (bool, int, string) {
 	}
 	return false, http.StatusUnauthorized, "invalid token"
 
+}
+
+// GetUserIdbyToken will give userid given valid token
+func GetUserIdbyToken(token string) (int, error) {
+	TokenNew, err := jwt.Parse(token, nil)
+	if TokenNew == nil {
+		return 0, err
+	}
+	return int(((TokenNew.Claims.(jwt.MapClaims))["userid"]).(float64)), nil
+}
+
+// GetRatingbyID will return movie rating given movie id and user id
+func GetRatingbyID(ID, MovieID int) int {
+	rating := 0
+	stmt := "select rating from rating_review where user_id = $1 AND movie_id = $2"
+	err := Dbhandler.db.QueryRow(stmt, ID, MovieID).Scan(&rating)
+	if err != nil {
+		return 0
+	}
+
+	return rating
+}
+
+// GetReviewbyID will retern review given by user if not found will return empty string
+func GetReviewbyID(ID, MovieID int) string {
+	review := ""
+	stmt := "select review from rating_review where user_id = $1 AND movie_id = $2"
+	err := Dbhandler.db.QueryRow(stmt, ID, MovieID).Scan(&review)
+	// fmt.Println("aaab")
+	if err != nil {
+		return ""
+	}
+	return review
 }

@@ -37,7 +37,3 @@ type JwtToken struct {
 }
 
 // gorm struct
-
-// MovieInfo will hold movies operation
-type MovieInfo struct {
-}
