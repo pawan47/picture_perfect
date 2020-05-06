@@ -22,8 +22,8 @@ func EndpointsInit() {
 	r.HandleFunc("/movie/catalogue/{ID}", GetMoviesByID).Methods("GET")
 	r.HandleFunc("/movies/rating/{ID}", RateMovie).Methods("POST")
 	r.HandleFunc("/movies/review/{ID}", ReviewMovie).Methods("POST")
-	// r.HandleFunc("/movies/rating/{ID}", DelRateMovie).Methods("DELETE")
-	// r.HandleFunc("/movies/review/{ID}", DelReviewMovie).Methods("DELETE")
+	r.HandleFunc("/movies/rating/{ID}", DelRateMovie).Methods("DELETE")
+	r.HandleFunc("/movies/review/{ID}", DelReviewMovie).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 

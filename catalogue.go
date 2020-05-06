@@ -27,12 +27,9 @@ func GetMoviesByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.Header.Get("Authorization")
-	// fmt.Println(token)
 	tokenArr := strings.Split(token, " ")
-	// fmt.Println(tokenArr,"s")
 	if len(tokenArr) == 2 {
 		vaild, _, _ := VerifyToken(tokenArr[1])
-		// fmt.Println(vaild)
 
 		if vaild == true {
 			UserID, err := GetUserIdbyToken(tokenArr[1])
