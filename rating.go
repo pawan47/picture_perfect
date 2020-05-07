@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -115,12 +116,14 @@ func DelRateMovie(w http.ResponseWriter, r *http.Request) {
 	}
 	stmt := "select rating from rating_review where movie_id = $1 AND user_id = $2 AND rating IS NOT NULL"
 	if RowExists(stmt, ID, UserID) {
-		stmt = "UPDATE table rating_review SET rating = NULL where movie_id = $1 AND user_id = $2"
+		stmt = "UPDATE rating_review SET rating = NULL where movie_id = $1 AND user_id = $2"
 		err = Dbhandler.db.QueryRow(stmt, ID, UserID).Scan()
 		if err != nil && err != sql.ErrNoRows {
 			error.Message = "deletion failed"
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(error)
+			fmt.Println(err)
+			return
 		}
 	} else {
 		error.Message = "rating DNE"

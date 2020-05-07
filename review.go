@@ -103,12 +103,13 @@ func DelReviewMovie(w http.ResponseWriter, r *http.Request) {
 	}
 	stmt := "select review from rating_review where movie_id = $1 AND user_id = $2 AND review IS NOT NULL"
 	if RowExists(stmt, ID, UserID) {
-		stmt = "UPDATE table rating_review SET review = NULL where movie_id = $1 AND user_id = $2"
+		stmt = "UPDATE rating_review SET review = NULL where movie_id = $1 AND user_id = $2"
 		err = Dbhandler.db.QueryRow(stmt, ID, UserID).Scan()
 		if err != nil && err != sql.ErrNoRows {
 			error.Message = "deletion failed"
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(error)
+			return
 		}
 	} else {
 		error.Message = "review DNE"

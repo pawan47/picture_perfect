@@ -24,6 +24,7 @@ func EndpointsInit() {
 	r.HandleFunc("/movies/review/{ID}", ReviewMovie).Methods("POST")
 	r.HandleFunc("/movies/rating/{ID}", DelRateMovie).Methods("DELETE")
 	r.HandleFunc("/movies/review/{ID}", DelReviewMovie).Methods("DELETE")
+	r.HandleFunc("/hulu", GetMoviesFilter).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 

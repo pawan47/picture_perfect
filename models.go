@@ -54,5 +54,14 @@ type MoviesInfo struct {
 	UserReview    string  `json:"user_review"`
 }
 
+type MovieListInfo struct {
+	MovieID       int     `json:"movie_id"`
+	Title         string  `json:"movie_name"`
+	Language      string  `json:"language"`
+	ThumbnailLink string  `json:"thumbnail_link"`
+	Genre         string  `json:"genre"`
+	Tagline       string  `json:"short_discription"`
+	VoteAverage   float32 `json:"vote_average"`
+}
 
 // gorm struct
