@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -37,6 +38,7 @@ func Gentoken(user User, TokenInvalid bool) (string, error) {
 	claims := &Claims{
 		Username: user.UserName,
 		UserID:   user.UserID,
+		Admin:    false,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expire.Unix(),
 		},
@@ -44,7 +46,6 @@ func Gentoken(user User, TokenInvalid bool) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	tokenstring, err := token.SignedString([]byte(SecretKey))
 	if err != nil {
-		log.Fatal(err)
 		return "", err
 	}
 	return tokenstring, nil
@@ -52,16 +53,12 @@ func Gentoken(user User, TokenInvalid bool) (string, error) {
 }
 
 // VerifyToken will verify if token is valid or not
-func VerifyToken(token string) (bool, int, string) {
-	// error string
-	// token := r.Header.Get("Auth")
-	// tokenArr := strings.Split(token, " ")
-	// if len(tokenArr) == 2{
-	// token = tokenArr[1]
+func VerifyToken(token string) (bool, string) {
 	_, pre := blacklist[token]
 	if pre == true {
-		return false, http.StatusUnauthorized, "invalid token"
+		return false, "invalid token"
 	}
+
 	AuthToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("There was an error")
@@ -70,12 +67,12 @@ func VerifyToken(token string) (bool, int, string) {
 		return []byte(SecretKey), nil
 	})
 	if err != nil {
-		return false, http.StatusUnauthorized, "invalid token"
+		return false, "invalid token"
 	}
 	if AuthToken.Valid {
-		return true, http.StatusAccepted, ""
+		return true, ""
 	}
-	return false, http.StatusUnauthorized, "invalid token"
+	return false, "invalid token"
 
 }
 
@@ -121,4 +118,23 @@ func RowExists(query string, args ...interface{}) bool {
 		return false
 	}
 	return exists
+}
+
+// JSONErrorWriter error writer
+func JSONErrorWriter(w http.ResponseWriter, err string, code int) {
+	w.WriteHeader(code)
+	var error Error
+	error.Message = err
+	json.NewEncoder(w).Encode(error)
+}
+
+// GetQuery will fetch query data and catches empty query
+func GetQuery(r *http.Request, param string) (string, error) {
+	params := r.URL.Query().Get(param)
+	var err Error
+	if param == "" {
+		err.Message = fmt.Sprintf("%s query not found", param)
+		return "", &err
+	}
+	return params, nil
 }

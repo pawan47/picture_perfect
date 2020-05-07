@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -13,25 +11,17 @@ import (
 // Reset will reset password on the basis of username #NotProtected
 func Reset(w http.ResponseWriter, r *http.Request) {
 	var user User
-	var error Error
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		error.Message = "internal error"
-		json.NewEncoder(w).Encode(error)
-		w.WriteHeader(http.StatusNoContent)
+		JSONErrorWriter(w, "Internal Error", http.StatusNoContent)
 		return
 	}
 	if user.UserName == "" {
-		error.Message = "username empty"
-		json.NewEncoder(w).Encode(error)
-		w.WriteHeader(http.StatusBadRequest)
+		JSONErrorWriter(w, "User name empty", http.StatusBadRequest)
 		return
 	}
-
 	if user.Password == "" {
-		error.Message = "password empty"
-		json.NewEncoder(w).Encode(error)
-		w.WriteHeader(http.StatusBadRequest)
+		JSONErrorWriter(w, "passord Empty", http.StatusBadRequest)
 		return
 	}
 	cost := 10
@@ -48,10 +38,7 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 	stmt := "update user_details set password = $1 where username= $2 RETURNING user_id;"
 	err = Dbhandler.db.QueryRow(stmt, user.Password, user.UserName).Scan(&user.UserID)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		error.Message = "user doesn't exist"
-		json.NewEncoder(w).Encode(error)
-		fmt.Println(err)
+		JSONErrorWriter(w, "User Doesn't Exist", http.StatusNoContent)
 		return
 	}
 	w.WriteHeader(http.StatusAccepted)
@@ -61,29 +48,15 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 
 // Logout function will verify token then it will assign a new token which will exipre now only
 func Logout(w http.ResponseWriter, r *http.Request) {
-	var error Error
-	token := r.Header.Get("Authorization")
-	// fmt.Println(token)
-	tokenArr := strings.Split(token, " ")
-	// fmt.Println(tokenArr,"s")
-	if len(tokenArr) != 2 {
-		error.Message = "tokemissing"
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(error)
+	var t JwtToken
+	t.Token = r.Header.Get("Authorization")
+	valid, message := t.CheckAuth()
+	if valid == false {
+		JSONErrorWriter(w, message, http.StatusUnauthorized)
 		return
 	}
-	vaild, code, message := VerifyToken(tokenArr[1])
-	if vaild == false {
-		error.Message = message
-		w.WriteHeader(code)
-		json.NewEncoder(w).Encode(error)
-		return
-	}
-
-	// // w.Header["token"] = ""
 	w.Header().Set("Authorization", "")
-	fmt.Println(tokenArr[1])
-	blacklist[tokenArr[1]] = true
+	blacklist[t.Token] = true
 	fmt.Fprintf(w, "token erased and included in blacklist")
 
 }
@@ -91,27 +64,19 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 // Login endpoint for login check and generating jwt token
 func Login(w http.ResponseWriter, r *http.Request) {
 	var user User
-	var error Error
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		// fmt.Fprintf(w, err)
-		error.Message = "internal error"
-		json.NewEncoder(w).Encode(error)
-		w.WriteHeader(http.StatusNoContent)
+		JSONErrorWriter(w, "Internal Error", http.StatusNoContent)
 		return
 	}
 
 	if user.UserName == "" {
-		error.Message = "username empty"
-		json.NewEncoder(w).Encode(error)
-		w.WriteHeader(http.StatusBadRequest)
+		JSONErrorWriter(w, "UserName empty", http.StatusBadRequest)
 		return
 	}
 
 	if user.Password == "" {
-		error.Message = "password empty"
-		json.NewEncoder(w).Encode(error)
-		w.WriteHeader(http.StatusBadRequest)
+		JSONErrorWriter(w, "Password Empty", http.StatusBadRequest)
 		return
 	}
 	password := user.Password
@@ -121,24 +86,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(user)
 
 	if err != nil {
-		log.Panic(err)
-		w.WriteHeader(http.StatusBadRequest)
-		error.Message = "username not found"
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "User Name not found in database", http.StatusBadRequest)
 		return
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		error.Message = "password incorrect"
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "Password Incorrect", http.StatusBadRequest)
 		return
 	}
 	token, err := Gentoken(user, false)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		error.Message = "failed to generate key"
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "Failed to generate key", http.StatusInternalServerError)
+		return
 	}
 	var jwttoken JwtToken
 	jwttoken.Token = token
@@ -157,20 +116,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Signup(w http.ResponseWriter, r *http.Request) {
 
 	var cred Credentials
-	var error Error
 	json.NewDecoder(r.Body).Decode(&cred)
 
 	if cred.UserName == "" {
-		error.Message = "username is missing"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "User Name is missing", http.StatusBadRequest)
 		return
 	}
-
 	if cred.Password == "" {
-		error.Message = "Empty Password"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "Empty Password", http.StatusBadRequest)
 		return
 	}
 	cost := 10
@@ -184,10 +137,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	stmt := "insert into user_details (first_name, last_name, username, password, is_admin) values($1, $2, $3, $4, $5) RETURNING user_id;"
 	err = Dbhandler.db.QueryRow(stmt, cred.FirstName, cred.LastName, cred.UserName, cred.Password, false).Scan(&cred.UserID)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		error.Message = "duplicate entry"
-		json.NewEncoder(w).Encode(error)
-		fmt.Println(err)
+		JSONErrorWriter(w, "Duplicate Entry", http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusAccepted)

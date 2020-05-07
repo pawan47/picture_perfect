@@ -2,8 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,52 +11,35 @@ import (
 
 // RateMovie required params movie_id, api_key, rating
 func RateMovie(w http.ResponseWriter, r *http.Request) {
-	// check authentication
-
-	var error Error
 	rating := r.URL.Query().Get("rate")
 	if rating == "" {
-		error.Message = "Rating missing"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "Rating missing", http.StatusBadRequest)
 		return
 	}
 	rate, err := strconv.Atoi(rating)
 	if rate < 0 || rate > 10 {
-		error.Message = "Invalid Rating"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "Invalid Rating", http.StatusBadRequest)
 		return
 	}
 	if err != nil {
-		error.Message = "Rating should be integer"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "Rating should be integer", http.StatusBadRequest)
 		return
 	}
-	token := r.Header.Get("Authorization")
-	tokenArr := strings.Split(token, " ")
-	if len(tokenArr) != 2 {
-		error.Message = "tokemissing"
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(error)
-		return
-	}
-	vaild, code, message := VerifyToken(tokenArr[1])
-	if vaild == false {
-		error.Message = message
-		w.WriteHeader(code)
-		json.NewEncoder(w).Encode(error)
+
+	var t JwtToken
+	t.Token = r.Header.Get("Authorization")
+	valid, message := t.CheckAuth()
+	if valid == false {
+		JSONErrorWriter(w, message, http.StatusUnauthorized)
 		return
 	}
 
 	vars := mux.Vars(r)
 	ID := vars["ID"]
-	UserID, err := GetUserIdbyToken(tokenArr[1])
+	UserID, err := GetUserIdbyToken(strings.Split(t.Token, " ")[1])
+	// fmt.Println(err)
 	if err != nil {
-		error.Message = "token invalid"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "Token Invalid", http.StatusBadRequest)
 		return
 	}
 	stmt := "select * from rating_review where movie_id = $1 AND user_id = $2"
@@ -66,20 +47,14 @@ func RateMovie(w http.ResponseWriter, r *http.Request) {
 		stmt = "update rating_review set rating = $1 where movie_id = $2 AND user_id = $3"
 		err = Dbhandler.db.QueryRow(stmt, rate, ID, UserID).Scan()
 		if err != nil && err != sql.ErrNoRows {
-			w.WriteHeader(http.StatusInternalServerError)
-			error.Message = "updation failed"
-			json.NewEncoder(w).Encode(error)
-			// fmt.Println(err)
+			JSONErrorWriter(w, "updation failed", http.StatusInternalServerError)
 			return
 		}
 	} else {
 		stmt = "insert into rating_review (movie_id, user_id, rating) values($1,$2,$3)"
 		err = Dbhandler.db.QueryRow(stmt, ID, UserID, rate).Scan()
 		if err != nil && err != sql.ErrNoRows {
-			w.WriteHeader(http.StatusBadRequest)
-			error.Message = "Movie id is not present"
-			json.NewEncoder(w).Encode(error)
-			// fmt.Println(err)
+			JSONErrorWriter(w, "Movie id is not present", http.StatusBadRequest)
 			return
 		}
 	}
@@ -88,30 +63,19 @@ func RateMovie(w http.ResponseWriter, r *http.Request) {
 
 // DelRateMovie will delete rating by user
 func DelRateMovie(w http.ResponseWriter, r *http.Request) {
-	var error Error
-	token := r.Header.Get("Authorization")
-	tokenArr := strings.Split(token, " ")
-	if len(tokenArr) != 2 {
-		error.Message = "tokemissing"
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(error)
-		return
-	}
-	vaild, code, message := VerifyToken(tokenArr[1])
-	if vaild == false {
-		error.Message = message
-		w.WriteHeader(code)
-		json.NewEncoder(w).Encode(error)
+	var t JwtToken
+	t.Token = r.Header.Get("Authorization")
+	valid, message := t.CheckAuth()
+	if valid == false {
+		JSONErrorWriter(w, message, http.StatusUnauthorized)
 		return
 	}
 
 	vars := mux.Vars(r)
 	ID := vars["ID"]
-	UserID, err := GetUserIdbyToken(tokenArr[1])
+	UserID, err := GetUserIdbyToken(strings.Split(t.Token, " ")[1])
 	if err != nil {
-		error.Message = "token invalid"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "token Invalid", http.StatusBadRequest)
 		return
 	}
 	stmt := "select rating from rating_review where movie_id = $1 AND user_id = $2 AND rating IS NOT NULL"
@@ -119,18 +83,12 @@ func DelRateMovie(w http.ResponseWriter, r *http.Request) {
 		stmt = "UPDATE rating_review SET rating = NULL where movie_id = $1 AND user_id = $2"
 		err = Dbhandler.db.QueryRow(stmt, ID, UserID).Scan()
 		if err != nil && err != sql.ErrNoRows {
-			error.Message = "deletion failed"
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(error)
-			fmt.Println(err)
+			JSONErrorWriter(w, "deletion failed", http.StatusInternalServerError)
 			return
 		}
 	} else {
-		error.Message = "rating DNE"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error)
+		JSONErrorWriter(w, "rating does not exist", http.StatusBadRequest)
 		return
 	}
-
 	w.WriteHeader(http.StatusOK)
 }

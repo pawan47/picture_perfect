@@ -1,6 +1,10 @@
 package main
 
-import "github.com/dgrijalva/jwt-go"
+import (
+	"strings"
+
+	"github.com/dgrijalva/jwt-go"
+)
 
 // Credentials :for stroing user cred
 type Credentials struct {
@@ -16,6 +20,7 @@ type Credentials struct {
 type Claims struct {
 	Username string `json:"username"`
 	UserID   int    `json:"userid"`
+	Admin    bool   `json:"is_admin"`
 	jwt.StandardClaims
 }
 
@@ -31,10 +36,29 @@ type Error struct {
 	Message string `json:"error"`
 }
 
+func (e *Error) Error() string {
+	return e.Message
+}
+
 // JwtToken huhuhuhu njnn
 type JwtToken struct {
 	Token string `json:"jwttoken"`
 }
+
+// CheckAuth Method is attached to JWTtoken struct which will check token validity
+func (t *JwtToken) CheckAuth() (bool, string) {
+	tokenArr := strings.Split(t.Token, " ")
+	if len(tokenArr) == 2 {
+		valid, message := VerifyToken(tokenArr[1])
+		if valid == true {
+			return true, ""
+		}
+		return false, message
+	}
+	return false, "Token missing"
+}
+
+// func (t *JwtToken)
 
 // MoviesInfo will be used to hold various movies details from db
 type MoviesInfo struct {
@@ -54,6 +78,7 @@ type MoviesInfo struct {
 	UserReview    string  `json:"user_review"`
 }
 
+// MovieListInfo will hold get /movie/{name} request
 type MovieListInfo struct {
 	MovieID       int     `json:"movie_id"`
 	Title         string  `json:"movie_name"`

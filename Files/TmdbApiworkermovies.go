@@ -29,7 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	MovieArray := []MoviesInfo{}
+	// MovieArray := []MoviesInfo{}
 	tmdbClient, err := tmdb.Init(("6b75cbe428b679bc311c9c50905fd313"))
 	if err != nil {
 		fmt.Println(err)

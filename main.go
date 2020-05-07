@@ -27,17 +27,14 @@ func main() {
 	blacklist = make(map[string]bool)
 	pqurl, err := pq.ParseURL("postgres://ccmnzryy:12OjOODSZeS_yTLUB-sDdJ3sU7swHDuz@arjuna.db.elephantsql.com:5432/ccmnzryy")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
-	// fmt.Println(pqurl)
 	Dbhandler.db, err = sql.Open("postgres", pqurl)
 	defer Dbhandler.db.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	err = Dbhandler.db.Ping()
-
 	if err != nil {
 		log.Fatal(err)
 	}
