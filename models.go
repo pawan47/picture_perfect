@@ -58,6 +58,26 @@ func (t *JwtToken) CheckAuth() (bool, string) {
 	return false, "Token missing"
 }
 
+// GetUserID method is attached to jwttoken
+func (t *JwtToken) GetUserID() (int, error) {
+	TokenNew, err := jwt.Parse(strings.Split(t.Token, " ")[1], nil)
+	if TokenNew == nil {
+		return 0, err
+	}
+	return int(((TokenNew.Claims.(jwt.MapClaims))["userid"]).(float64)), nil
+
+}
+
+// IsAdmin method is attached to jwttoken
+func (t *JwtToken) IsAdmin() (bool, error) {
+	TokenNew, err := jwt.Parse(strings.Split(t.Token, " ")[1], nil)
+	if TokenNew == nil {
+		return false, err
+	}
+	return ((TokenNew.Claims.(jwt.MapClaims))["userid"]).(bool), nil
+
+}
+
 // func (t *JwtToken)
 
 // MoviesInfo will be used to hold various movies details from db
@@ -88,5 +108,3 @@ type MovieListInfo struct {
 	Tagline       string  `json:"short_discription"`
 	VoteAverage   float32 `json:"vote_average"`
 }
-
-// gorm struct
