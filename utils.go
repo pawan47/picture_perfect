@@ -132,9 +132,16 @@ func JSONErrorWriter(w http.ResponseWriter, err string, code int) {
 func GetQuery(r *http.Request, param string) (string, error) {
 	params := r.URL.Query().Get(param)
 	var err Error
-	if param == "" {
+	// fmt.Println(params,)
+	if params == "" {
 		err.Message = fmt.Sprintf("%s query not found", param)
 		return "", &err
 	}
 	return params, nil
+}
+
+func setupResponse(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }

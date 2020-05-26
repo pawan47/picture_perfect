@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -40,38 +39,37 @@ func GetMoviesByID(w http.ResponseWriter, r *http.Request) {
 
 // GetMoviesFilter will handle get /movies{name} request
 func GetMoviesFilter(w http.ResponseWriter, r *http.Request) {
+	setupResponse(&w) //for cors
 	stmt := "SELECT movie_id, movie_name, short_discription, thumbnail_link, vote_average, genre, language FROM movie_info"
 	var conditions []string
-	res := r.URL.Query()["genre"]
-	for _, ele := range res {
-		conditions = append(conditions, fmt.Sprintf("genre = '%s'", ele))
-	}
-	ress, err := GetQuery(r, "language")
+	genre, err := GetQuery(r, "genre")
 	if err == nil {
-		conditions = append(conditions, fmt.Sprintf("language = '%s'", ress))
+		conditions = append(conditions, fmt.Sprintf("genre = '%s'", genre))
+	}
+	search, err := GetQuery(r, "search")
+
+	if err == nil {
+		s := "%"
+		for i := 0; i < len(search); i++ {
+			s += string(search[i]) + "%"
+		}
+		conditions = append(conditions, fmt.Sprintf("movie_name LIKE '%s'", s))
+	}
+
+	lan, err := GetQuery(r, "language")
+	if err == nil {
+		conditions = append(conditions, fmt.Sprintf("language = '%s'", lan))
 	}
 	if len(conditions) > 0 {
 		stmt += " WHERE " + strings.Join(conditions[:], " AND ")
 	}
-	ress, _ = GetQuery(r, "sortby")
-	lim, _ := GetQuery(r, "limit")
-	off, _ := GetQuery(r, "offset")
-	if ress == "" || lim == "" || off == "" {
+	sortby, _ := GetQuery(r, "sortby")
+
+	if sortby == "" {
 		JSONErrorWriter(w, "invalid URL", http.StatusBadRequest)
 		return
 	}
-	limit, _ := strconv.Atoi(lim)
-	offset, _ := strconv.Atoi(off)
-	if offset < 1 {
-		JSONErrorWriter(w, "invalid URL", http.StatusBadRequest)
-		return
-	}
-	offset = (offset - 1) * limit
-
-	stmt += fmt.Sprintf(" ORDER BY %s", ress)
-	stmt += fmt.Sprintf(" LIMIT %d", limit)
-	stmt += fmt.Sprintf(" OFFSET %d", offset)
-
+	stmt += fmt.Sprintf(" ORDER BY %s", sortby)
 	row, err := Dbhandler.db.Query(stmt)
 	defer row.Close()
 	if err != nil && err != sql.ErrNoRows {
@@ -91,5 +89,3 @@ func GetMoviesFilter(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 
 }
-
-// func GetMoviesSearch()

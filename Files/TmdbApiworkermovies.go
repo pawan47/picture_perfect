@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/lib/pq"
@@ -30,47 +31,59 @@ func main() {
 		log.Fatal(err)
 	}
 	// MovieArray := []MoviesInfo{}
-	tmdbClient, err := tmdb.Init(("6b75cbe428b679bc311c9c50905fd313"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	tmdbClient.SetClientAutoRetry()
-	options := map[string]string{
-		"language": "en-US",
-		"page":     "3",
-	}
-	list, err := tmdbClient.GetDiscoverMovie(options)
-	for i := 0; i < len(list.Results); i++ {
-		movies = append(movies, (list.Results)[i].ID)
-	}
 	count := 0
-	for i := 0; i < len(movies); i++ {
-
-		det, err := tmdbClient.GetMovieDetails(int(movies[i]), nil)
+	for pageno := 1; pageno <= 100; pageno++ {
+		tmdbClient, err := tmdb.Init(("6b75cbe428b679bc311c9c50905fd313"))
 		if err != nil {
 			fmt.Println(err)
-			continue
 		}
-		mov := MoviesInfo{}
-		mov.Adult = det.Adult
-		mov.Genre = det.Genres[0].Name
-		mov.Language = det.OriginalLanguage
-		mov.MovieID = det.ID
-		mov.Overview = det.Overview
-		mov.Tagline = det.Tagline
-		mov.ThumbnailLink = tmdb.GetImageURL(det.PosterPath, "original")
-		mov.Title = det.Title
-		mov.VoteAverage = det.VoteAverage
-		mov.VoteCount = det.VoteCount
+		tmdbClient.SetClientAutoRetry()
 
-		stmt := "insert into movie_info (movie_id, movie_name, short_discription, long_discription, thumbnail_link, genre,language, vote_average, vote_count,actor,actress,director) values($1, $2, $3, $4, $5,$6,$7,$8,$9,$10,$11,$12);"
-		// fmt.Println(mov.MovieID, mov.Title, mov.Tagline, mov.Overview, mov.ThumbnailLink, mov.Genre, mov.Language)
-		err = db.QueryRow(stmt, mov.MovieID, mov.Title, mov.Tagline, mov.Overview, mov.ThumbnailLink, mov.Genre, mov.Language, mov.VoteAverage, mov.VoteCount, "", "", "").Scan()
+		options := map[string]string{
+			"page":          strconv.Itoa(pageno),
+			"include_adult": "true",
+			// "sort_by":       "primary_release_date.desc",
+		}
+		list, err := tmdbClient.GetDiscoverMovie(options)
 		if err != nil {
 			fmt.Println(err)
-			continue
 		}
-		count++
+		for i := 0; i < len(list.Results); i++ {
+			movies = append(movies, (list.Results)[i].ID)
+		}
+		fmt.Println(len(list.Results))
+		count = 0
+		// stmt := "select movies_id from movie_info"
+
+		for i := 0; i < len(movies); i++ {
+
+			det, err := tmdbClient.GetMovieDetails(int(movies[i]), nil)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			mov := MoviesInfo{}
+			mov.Adult = det.Adult
+			mov.Genre = det.Genres[0].Name
+			mov.Language = det.OriginalLanguage
+			mov.MovieID = det.ID
+			mov.Overview = det.Overview
+			mov.Tagline = det.Tagline
+			mov.ThumbnailLink = tmdb.GetImageURL(det.PosterPath, "original")
+			mov.Title = det.Title
+			mov.VoteAverage = det.VoteAverage
+			mov.VoteCount = det.VoteCount
+
+			stmt := "insert into movie_info (movie_id, movie_name, short_discription, long_discription, thumbnail_link, genre,language, vote_average, vote_count,actor,actress,director) values($1, $2, $3, $4, $5,$6,$7,$8,$9,$10,$11,$12);"
+			// fmt.Println(mov.MovieID, mov.Title, mov.Tagline, mov.Overview, mov.ThumbnailLink, mov.Genre, mov.Language)
+			err = db.QueryRow(stmt, mov.MovieID, mov.Title, mov.Tagline, mov.Overview, mov.ThumbnailLink, mov.Genre, mov.Language, mov.VoteAverage, mov.VoteCount, "", "", "").Scan()
+			if err != nil && err != sql.ErrNoRows {
+				// fmt.Println(err)
+				continue
+			}
+			fmt.Println(mov.MovieID, mov.Title)
+			count++
+		}
 		// MovieArray = append(MovieArray, mov)
 	}
 	defer db.Close()
