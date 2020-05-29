@@ -69,7 +69,7 @@ func main() {
 			mov.MovieID = det.ID
 			mov.Overview = det.Overview
 			mov.Tagline = det.Tagline
-			mov.ThumbnailLink = tmdb.GetImageURL(det.PosterPath, "original")
+			mov.ThumbnailLink = tmdb.GetImageURL(det.PosterPath, "w154")
 			mov.Title = det.Title
 			mov.VoteAverage = det.VoteAverage
 			mov.VoteCount = det.VoteCount
