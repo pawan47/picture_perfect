@@ -1,0 +1,17 @@
+==== Docker Pull
+docker pull pawan47/picture_perfect
+
+
+
+==== Docker run command
+sudo docker run -d -p 80:8080 pawan47/picture_perfect
+
+
+
+==== Docker build
+docker build ./ -t pawan47/picture_perfect:0.0.2
+
+==== Docker push
+docker push pawan47/picture_perfect:0.0.2
+
+
