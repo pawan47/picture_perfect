@@ -1,0 +1,27 @@
+export const Genres = ["All",
+  "Crime",
+  "Animation",
+  "Documentary",
+  "Romance",
+  "History",
+  "Mystery",
+  "Fantasy",
+  "Science Fiction",
+  "Horror",
+  "Drama",
+  "Action",
+  "Thriller",
+  "Comedy",
+  "Adventure",
+  "War",
+  "Family",
+]
+
+
+export const sortBymenu = ["vote_average DESC",
+"vote_average ASC",
+ "vote_count DESC",
+ "vote_count ASC",
+ "movie_name DESC",
+ "movie_name ASC",
+]

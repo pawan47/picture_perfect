@@ -1,0 +1,164 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+
+.carousel-indicators li {    
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+}
+
+.body-cont {
+  /* background-color: #EDEDED; */
+  /* background-image: url(11333.jpg); */
+  background-color: #e7e7e7;
+  min-height: 82vh;
+}
+
+
+
+.navbar-custom{
+  background-color: #a1a0a0;
+}
+
+.body-fill{
+  margin-left: -15px;
+  margin-right: -15px;
+}
+.card-content-body{
+  margin-top:-15px;
+  margin-left:-15px;
+}
+
+.card-content{
+  margin-top:-15px;
+   margin-left: 2px;
+}
+
+.card-body{
+  width: 200px; 
+  height : 220px;
+}
+
+.card-img{
+  width: 200px;
+  height : 150px;
+}
+
+.pagination > li > a
+{
+  background-color: white;
+  color: rgb(15, 11, 20);
+}
+
+.pagination > li > a:focus,
+.pagination > li > a:hover,
+.pagination > li > span:focus,
+.pagination > li > span:hover
+{
+  color: #1f1111;
+  background-color: #eee;
+  border-color: rgb(48, 46, 46);
+  margin: 0%;
+}
+
+.pagination > .active > a
+{
+  color: white;
+  background-color: #5A4181 !Important;
+  border: solid 1px #5A4181 !Important;
+}
+
+.pagination > .active > a:hover
+{
+  background-color: #5A4181 !Important;
+  border: solid 1px #5A4181;
+}
+
+.font-nav{
+  font-size: 18px;
+}
+
+.space{
+  margin-top: 0px;
+}
+
+.space-navbar{
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.navbar-light .navbar-toggle .icon-bar {
+  background: black;
+}
+
+.box{
+  position: relative;
+  display: inline-block; /* Make the width of box same as image */
+  transition: transform .2s;
+}
+.box .text{
+  position: absolute;
+  z-index: 999;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  top: 75%; /* Adjust this value to move the positioned div up and down */
+  text-align: center;
+  width: 60%; /* Set the width of the positioned div */
+  color: white;
+}
+
+.box:hover{
+  transform: scale(1.1);
+}
+
+
+
+#basic-nav-dropdown{
+  color:grey;
+  font-size: 110%;
+}
+
+
+.footer-style{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color : black;
+}
+
+
+.card {
+  margin-left: -15px;
+  margin-right: -15px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+  /* width: 10%; */
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* .searchbar-container{
+  display: flex;
+
+  justify-content: space-between;
+} */
+
+
