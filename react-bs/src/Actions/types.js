@@ -1,2 +1,4 @@
 export const FETCH_MOVIES = 'FETCH_MOVIES'
 export const FETCH_MOVIE = 'FETCH_MOVIE'
+export const UPDATE_PARAMS = 'UPDATE_PARAMS'
+export const ADD_REVIEW = 'ADD_REVIEW'

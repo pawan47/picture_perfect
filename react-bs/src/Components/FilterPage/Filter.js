@@ -37,7 +37,7 @@ const sortByList = sortBymenu.map(sort => {
   )
 }) 
 
-export default function SimpleSelect({ updateParams, initparams }) {
+export default function SimpleSelect({ setparams, initparams }) {
   const classes = useStyles();
   const [genre, setGenre] = React.useState(initparams.genre);
   const [sortBy, setSortBy] = React.useState("vote_average DESC");
@@ -55,7 +55,11 @@ export default function SimpleSelect({ updateParams, initparams }) {
 
   const handlesubmit = (e) => {
     e.preventDefault()
-    updateParams(searchField, genre, sortBy)
+    setparams({
+      search : searchField, 
+      genre : genre, 
+      sortby : sortBy
+    })
   }
 
   return (

@@ -10,13 +10,15 @@ export const getMovies = (domain, params) => dispatch => {
             if (res.data !== null) {
                 dispatch({
                     type : FETCH_MOVIES,
-                    payload : res.data
+                    payload : res.data,
+                    params : params
                 })
                 
             } else {
                 dispatch({
                     type: FETCH_MOVIES,
-                    payload: []
+                    payload: [],
+                    params : params
                 })
             }
         }
@@ -26,3 +28,4 @@ export const getMovies = (domain, params) => dispatch => {
     })
 }
 
+export default getMovies;

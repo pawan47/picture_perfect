@@ -1,21 +1,14 @@
 import React from 'react'
 import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
-
+import {Link} from 'react-router-dom'
 // local imports
 import CatalogueButton from '../HomePage/CatalogueButton'
-import DNE from '../../images/Poster_not_available.jpg'
+import ProcessImage from './ProcessImage'
 
-const ProcessImage = (imglink, imageSize) => {
-    const arr = imglink.split("/")
-    if(arr.length !== 7){
-        return DNE
-    }
-    arr[5] = imageSize
-    imglink =  arr.join('/')
-    return imglink
+const getLink = (movie_id) => {
+    return ( '/movie/' + movie_id)
 }
-
 
 function List({ list, catalogueHidden}) {
     const postlist = list.length ? (
@@ -24,10 +17,10 @@ function List({ list, catalogueHidden}) {
                 <Col xs={12} sm={6} md={3} large={2} xl={2} className="mb-3 mt-3 justify-content-center text-center" key = {movie.movie_id}>
 
                     <div className='box '>
-                        <a href={ProcessImage(movie.thumbnail_link, "w154")}>
+                        <Link to={getLink(movie.movie_id)}>
                             <img className=' mb-3' src={ProcessImage(movie.thumbnail_link, "w154")} loading = "lazy" alt={movie.movie_id}
                                 style={{ borderRadius: 10, width: 130, height: 194 }} />
-                        </a>
+                        </Link>
                     </div>
                 </Col>
             )

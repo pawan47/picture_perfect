@@ -11,7 +11,7 @@ const seperate = (str) => {
 }
 
 
-const GetInitParams = (query, queryParams) => {
+export const GetInitParams = (query, queryParams) => {
     if (queryParams !== "") {
         const queriesObj = seperate(queryParams)
         for(let key in queriesObj){
@@ -26,4 +26,18 @@ const GetInitParams = (query, queryParams) => {
     return ""
 }
 
-export default GetInitParams;
+export const convertParams = (search, genre, sortby) => {
+    const param = {
+        search : null,
+        genre : null,
+        sortby : sortby,
+    }
+    if(search !== ""){
+        param.search = search
+    }
+    if(genre !== "All"){
+        param.genre = genre
+    }
+    return param
+}
+// export default GetInitParams;

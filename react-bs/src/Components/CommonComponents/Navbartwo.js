@@ -22,7 +22,7 @@ function Navbartwo() {
     return (
         <Navbar bg="light" expand="lg" variant="light">
         <div className = "container">
-            <Navbar.Brand as = {Link} to ="/">
+            <Navbar.Brand href ="/">
                 <img src={logo} loading = "lazy" alt='logo' style={{ width: 40 }} />{''} <span style={{ color: "black" }}>Picture Perfect</span>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav"></Navbar.Toggle>

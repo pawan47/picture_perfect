@@ -2,9 +2,9 @@ import React from 'react'
 import Pagination from 'react-bootstrap/Pagination'
 
 
-
 const Paginate = ({totalMovies, currentPage, moviePerPage, changePage}) => {
     const items = []
+    // console.log(totalMovies)
     if (totalMovies === 0) {
         return null;
     }
@@ -33,7 +33,7 @@ const Paginate = ({totalMovies, currentPage, moviePerPage, changePage}) => {
     }} />)
     items.push(<Pagination.Last key = {totalPage + 2}  onClick={() => changePage(totalPage)} />)
     return (
-        <Pagination className="justify-content-center mb-4" bsPrefix='pagination'>
+        <Pagination className="justify-content-center mt-4" bsPrefix='pagination'>
             {items}
         </Pagination>
     )
