@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 
 // GetMoviesByID is a endpoint for the GET /movies/{name} request
 func GetMoviesByID(w http.ResponseWriter, r *http.Request) {
+	setupResponse(&w)
 	vars := mux.Vars(r)
 	ID := vars["ID"]
 	var movie MoviesInfo
@@ -33,6 +35,28 @@ func GetMoviesByID(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
+
+	// As we dont have review I am fetching review from a different end point
+
+	response, err := http.Get("https://jsonplaceholder.typicode.com/comments")
+	defer response.Body.Close()
+	if err == nil {
+		data, err := ioutil.ReadAll(response.Body)
+		if err == nil {
+			// movie.Review{}
+			// stringdata := string(data)
+			// fmt.Println(stringdata)
+			// var reviewjson []ReviewEndPoint
+			json.Unmarshal(data, &movie.Review)
+			movie.Review = movie.Review[:10]
+			// fmt.Println(movie.Review[:10])
+		}
+		// fmt.Println(ReviewMovie)
+		// fmt.Println(string(data))
+		// movie.Review = data
+
+	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(movie)
 }
@@ -40,6 +64,7 @@ func GetMoviesByID(w http.ResponseWriter, r *http.Request) {
 // GetMoviesFilter will handle get /movies{name} request
 func GetMoviesFilter(w http.ResponseWriter, r *http.Request) {
 	setupResponse(&w) //for cors
+	// fmt.Println()
 	stmt := "SELECT movie_id, movie_name, short_discription, thumbnail_link, vote_average, genre, language FROM movie_info"
 	var conditions []string
 	genre, err := GetQuery(r, "genre")
@@ -70,6 +95,7 @@ func GetMoviesFilter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	stmt += fmt.Sprintf(" ORDER BY %s", sortby)
+	// fmt.Println(stmt)
 	row, err := Dbhandler.db.Query(stmt)
 	defer row.Close()
 	if err != nil && err != sql.ErrNoRows {

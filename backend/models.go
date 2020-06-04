@@ -31,6 +31,15 @@ type User struct {
 	Password string `json:"password"`
 }
 
+// ReviewEndPoint will fetch review from an external api for now as we dont have much review
+type ReviewEndPoint struct {
+	PostID int    `json:"postId"`
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	Email  string `json:"email"`
+	Body   string `json:"body"`
+}
+
 //Error will have all variable required to handle errors
 type Error struct {
 	Message string `json:"error"`
@@ -82,20 +91,21 @@ func (t *JwtToken) IsAdmin() (bool, error) {
 
 // MoviesInfo will be used to hold various movies details from db
 type MoviesInfo struct {
-	MovieID       int     `json:"movie_id"`
-	Title         string  `json:"movie_name"`
-	Language      string  `json:"language"`
-	ThumbnailLink string  `json:"thumbnail_link"`
-	Genre         string  `json:"genre"`
-	Overview      string  `json:"long_discription"`
-	Tagline       string  `json:"short_discription"`
-	VoteAverage   float32 `json:"vote_average"`
-	VoteCount     int64   `json:"vote_count"`
-	Actor         *string `json:"actor"`
-	Actress       *string `json:"actress"`
-	Director      *string `json:"director"`
-	UserRating    int     `json:"user_rating"`
-	UserReview    string  `json:"user_review"`
+	MovieID       int              `json:"movie_id"`
+	Title         string           `json:"movie_name"`
+	Language      string           `json:"language"`
+	ThumbnailLink string           `json:"thumbnail_link"`
+	Genre         string           `json:"genre"`
+	Overview      string           `json:"long_discription"`
+	Tagline       string           `json:"short_discription"`
+	VoteAverage   float32          `json:"vote_average"`
+	VoteCount     int64            `json:"vote_count"`
+	Actor         *string          `json:"actor"`
+	Actress       *string          `json:"actress"`
+	Director      *string          `json:"director"`
+	UserRating    int              `json:"user_rating"`
+	UserReview    string           `json:"user_review"`
+	Review        []ReviewEndPoint `json:"review"`
 }
 
 // MovieListInfo will hold get /movie/{name} request
