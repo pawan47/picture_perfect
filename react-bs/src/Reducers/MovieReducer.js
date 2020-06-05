@@ -3,7 +3,7 @@ import { FETCH_MOVIES, UPDATE_PARAMS } from './../Actions/types'
 
 const initState = {
     moviesList: [],
-    domain: "http://localhost:8080/movie/catalogue",
+    domain: "http://13.232.168.173/movie/catalogue",
     params: {
         search: null,
         genre: null,
